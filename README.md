@@ -1,0 +1,2 @@
+# cfpurge
+Simple Cloudflare purging

@@ -5,21 +5,38 @@ import (
 
 	"github.com/cloudflare/cloudflare-go"
 )
+// YAML file in secrets folder
+//	cf = new(cfpurge)
+//
 
-type cfpurge struct {
-	ApiToken     string // Under MyProfile/API Tokens
-	ZoneId       string // click domain that you want, on right side, Zone Id
-	EmailAddress string // Email address for your cloudflare account
-	api          *cloudflare.API
+type Cfpurge struct {
+	ApiToken     string          `yaml:"apitoken"` // Under MyProfile/API Tokens
+	ZoneId       string          `yaml:"zoneid"`   // click domain that you want, on right side, Zone Id
+	EmailAddress string          `yaml:"email"`    // Email address for your cloudflare account
+	Api          *cloudflare.API `yaml:"-"`
 }
 
-func (c cfpurge) New(apitoken string, zoneid string, eaddr string) (cfpurge, error) {
+func (c *cfpurge) Init(apitoken string, zoneid string, eaddr string)  error {
 	api, err := cloudflare.New(apitoken, eaddr)
 	if err != nil {
-		return cfpurge{}, err
+		return  err
 	}
-	newcf := cfpurge{apitoken, zoneid, eaddr, api}
-	return newcf, nil
+	c.api = api
+	c.ApiToken = apitoken
+	c.ZoneId =  zoneid
+	c.EmailAddress = eaddr
+	return nil
+}
+
+func (c cfpurge) InitFromYaml(filename string)  error {
+// https://stackoverflow.com/questions/30947534/how-to-read-a-yaml-file
+buf, err := ioutil.ReadFile(filename)
+if err != nil {
+	return  err
+}
+
+err = yaml.Unmarshal(buf, c)
+if err != nil {
 }
 
 func (c cfpurge) PurgeFile(fn string) (cloudflare.PurgeCacheResponse, error) {

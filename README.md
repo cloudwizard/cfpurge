@@ -1,2 +1,2 @@
 # cfpurge
-Simple Cloudflare purging
+Simple Cloudflare purging for Golang
